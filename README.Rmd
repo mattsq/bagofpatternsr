@@ -1,0 +1,53 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# bagofpatternsr
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of bagofpatternsr is to provide a simple implementation of the 'Bag of Patterns' time series classification algorithm as described by Lin et al (2012). It's based on the description at timeseriesclassification.com - there are other implementations of it in R, but some are built in Java which can be tricky to run.
+
+## Installation
+
+You can install the development version from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("mattsq/bagofpatternsr")
+```
+## Example
+
+Using it is easy! Models are fit like so:
+
+```{r example}
+library(bagofpatternsr)
+data("FaceAll_TRAIN")
+data("FaceAll_TEST")
+model <- bagofpatternsr::bagofpatterns_knn(FaceAll_TRAIN, 
+                                           target = "target",
+                                           verbose = FALSE)
+```
+
+Predictions on new datasets can be retrieved like so:
+
+```{r cars}
+new_preds  <- bagofpatternsr::predict_bagofpatterns_knn(model, 
+                                                        newdata = FaceAll_TEST,
+                                                        verbose = FALSE)
+table(new_preds, FaceAll_TEST$target)
+
+```
+
