@@ -18,10 +18,10 @@
 #'
 #' @export
 bagofpatterns_knn <- function(data, target = "target",
-                          k = 5,
-                          window_size = 40,
-                          alphabet_size = 5,
-                          PAA_number = 10,
+                          k = 1,
+                          window_size = 200,
+                          alphabet_size = 4,
+                          PAA_number = 8,
                           breakpoints = "quantiles",
                           verbose = TRUE) {
   model_data <- list(
