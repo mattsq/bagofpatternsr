@@ -4,7 +4,7 @@
 \alias{predict_bagofpatterns_knn}
 \title{Predict using a Bag of Patterns KNN Model}
 \usage{
-predict_bagofpatterns_knn(model, newdata = NULL)
+predict_bagofpatterns_knn(model, newdata = NULL, verbose = TRUE)
 }
 \arguments{
 \item{model}{a fitted model returned by \code{bagofpatterns_knn}}
