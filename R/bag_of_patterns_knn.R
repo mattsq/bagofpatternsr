@@ -9,6 +9,7 @@
 #' training data.
 #' @param data a data frame where each row is a time series, along with a column for class
 #' @param target the name of the column where the class of each row is stored
+#' @param k number of neighbours to base the predicted class on
 #' @param window_size The size of the sliding windows as applied to the time series
 #' @param alphabet_size the number of distinct letters to use in the compressed SAX representation
 #' @param PAA_number the size of the 'words' generated out of the alphabet by SAX
@@ -17,13 +18,14 @@
 #' @examples
 #'
 #' @export
-bagofpatterns_knn <- function(data, target = "target",
-                          k = 1,
-                          window_size = 200,
-                          alphabet_size = 4,
-                          PAA_number = 8,
-                          breakpoints = "quantiles",
-                          verbose = TRUE) {
+bagofpatterns_knn <- function(data,
+                              target = "target",
+                              k = 1,
+                              window_size = 200,
+                              alphabet_size = 4,
+                              PAA_number = 8,
+                              breakpoints = "quantiles",
+                              verbose = TRUE) {
   model_data <- list(
     training_data = data,
     converted_training_data = NA,

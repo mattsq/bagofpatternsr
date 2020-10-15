@@ -30,7 +30,7 @@ convert_vector_to_word_hist <- function(vec, window_size, alphabet_size, PAA_num
 #' @importFrom purrr map
 #' @importFrom dplyr bind_rows
 convert_df_to_bag_of_words <- function(data, window_size, alphabet_size, PAA_number, breakpoints, verbose) {
-  purrr::map(1:nrow(data), ~ {
+  bow <- purrr::map_dfr(1:nrow(data), ~ {
     if (verbose) print(.x)
     convert_vector_to_word_hist(unlist(data[.x,]),
                                 window_size = window_size,
@@ -38,7 +38,7 @@ convert_df_to_bag_of_words <- function(data, window_size, alphabet_size, PAA_num
                                 PAA_number = PAA_number,
                                 breakpoints = breakpoints)
   }
-  ) %>%
-    dplyr::bind_rows() %>%
-    replace(is.na(.), 0)
+  )
+    bow <- replace(is.na(bow), 0)
+    return(bow)
 }
