@@ -1,12 +1,24 @@
 
 #' @importFrom seewave SAX
-#' @importFrom tidyr pivot_wider
-convert_vector_to_word_hist <- function(vec, window_size, alphabet_size, PAA_number, breakpoints) {
-  words <- character(length = length(vec))
+#' @importFrom dplyr slice_sample
+convert_vector_to_word_hist <- function(vec, window_size, sparse_windows_val, alphabet_size, PAA_number, breakpoints) {
+  vec_length <- length(vec)
+
+  windows <- data.frame(
+    window_starts = 1:(vec_length - window_size + 1),
+    window_ends = window_size:vec_length
+  )
+
+  if(!is.na(sparse_windows_val)) {
+    windows <- dplyr::slice_sample(windows, n = sparse_windows_val)
+  }
+
+  words <- character(nrow(windows))
   idx <- 1
-  for (k2 in 1:length(vec)) {
-    start <- k2
-    end <- min(c(k2 + window_size, length(vec)))
+
+  for (k2 in 1:nrow(windows)) {
+    start <- (windows$window_starts[k2])
+    end <- (windows$window_ends[k2])
     vec_window <- vec[start:end]
     word <- seewave::SAX(vec_window,
                          alphabet_size = alphabet_size,
@@ -21,24 +33,31 @@ convert_vector_to_word_hist <- function(vec, window_size, alphabet_size, PAA_num
     words[idx] <- word
     idx <- idx + 1
   }
+
   words <- words[!words == ""]
   words <- as.data.frame(table(words))
-  words <- tidyr::pivot_wider(words, names_from = words, values_from = Freq)
   return(words)
 }
 
 #' @importFrom purrr map
-#' @importFrom dplyr bind_rows
-convert_df_to_bag_of_words <- function(data, window_size, alphabet_size, PAA_number, breakpoints, verbose) {
+#' @importFrom dplyr bind_rows group_by summarise select
+#' @importFrom tidyr pivot_wider
+convert_df_to_bag_of_words <- function(data, window_size, sparse_windows_val, alphabet_size, PAA_number, breakpoints, verbose) {
   bow <- purrr::map_dfr(1:nrow(data), ~ {
     if (verbose) print(.x)
     convert_vector_to_word_hist(unlist(data[.x,]),
                                 window_size = window_size,
+                                sparse_windows_val = sparse_windows_val,
                                 alphabet_size = alphabet_size,
                                 PAA_number = PAA_number,
                                 breakpoints = breakpoints)
-  }
+  }, .id = "idx"
   )
-    bow <- replace(is.na(bow), 0)
+  bow <- bow %>%
+    dplyr::group_by(words, idx) %>%
+    dplyr::summarise(Freq = sum(Freq)) %>%
+    tidyr::pivot_wider(id_cols = idx, names_from = words, values_from = Freq, values_fill = 0) %>%
+    dplyr::select(-idx)
+
     return(bow)
 }

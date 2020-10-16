@@ -16,12 +16,13 @@ predict_bagofpatterns_knn <- function(model, newdata = NULL, verbose = TRUE) {
   if(is.null(newdata)) {
     preds <- class::knn(model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
                         model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
-                        cl = model$converted_training_data[model$target],
+                        cl = unlist(model$converted_training_data[model$target]),
                         k = model$k)
   } else {
     X_test_df <- newdata[,!colnames(newdata) == model$target]
     converted_test_data <- convert_df_to_bag_of_words(X_test_df,
                                                       window_size = model$SAX_args$window_size,
+                                                      sparse_windows_val = model$SAX_args$sparse_windows_val,
                                                       alphabet_size = model$SAX_args$alphabet_size,
                                                       PAA_number = model$SAX_args$PAA_number,
                                                       breakpoints = model$SAX_args$breakpoints,

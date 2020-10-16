@@ -9,6 +9,7 @@ bagofpatterns_knn(
   target = "target",
   k = 1,
   window_size = 200,
+  sparse_windows = FALSE,
   alphabet_size = 4,
   PAA_number = 8,
   breakpoints = "quantiles",
@@ -19,6 +20,8 @@ bagofpatterns_knn(
 \item{data}{a data frame where each row is a time series, along with a column for class}
 
 \item{target}{the name of the column where the class of each row is stored}
+
+\item{k}{number of neighbours to base the predicted class on}
 
 \item{window_size}{The size of the sliding windows as applied to the time series}
 
