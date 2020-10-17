@@ -38,6 +38,7 @@ data("FaceAll_TRAIN")
 data("FaceAll_TEST")
 model <- bagofpatternsr::bagofpatterns_knn(FaceAll_TRAIN, 
                                            target = "target",
+                                           window_size = 20,
                                            verbose = FALSE)
 ```
 
