@@ -52,3 +52,39 @@ table(new_preds, FaceAll_TEST$target)
 
 ```
 
+There's support for the entirely atheoretical idea of 'sparse windows' - essentially, rather than generating a dictionary out of every single window, we take inspiration from Time Series Forest by taking `sqrt(m)` random windows from each vector. It speed up training dramatically, and seems to improve generalization - compare:
+
+```{r}
+library(tsforest)
+data("FreezerRegularTrain_TRAIN")
+
+model <- bagofpatterns_knn(FreezerRegularTrain_TRAIN, 
+                           window_size = 100, 
+                           sparse_windows = FALSE, k = 1, 
+                           verbose = FALSE, 
+                           alphabet_size = 2,
+                           PAA_number = 3)
+
+preds <- predict_bagofpatterns_knn(model, FreezerRegularTrain_TEST, verbose = FALSE)
+
+table(preds, FreezerRegularTrain_TEST$target)
+mean(preds == FreezerRegularTrain_TEST$target)
+```
+
+With:
+
+```{r}
+data("FreezerRegularTrain_TRAIN")
+
+model <- bagofpatterns_knn(FreezerRegularTrain_TRAIN, 
+                           window_size = 100, 
+                           sparse_windows = TRUE, k = 1, 
+                           verbose = FALSE, 
+                           alphabet_size = 2,
+                           PAA_number = 3)
+
+preds <- predict_bagofpatterns_knn(model, FreezerRegularTrain_TEST, verbose = FALSE)
+
+table(preds, FreezerRegularTrain_TEST$target)
+mean(preds == FreezerRegularTrain_TEST$target)
+```
