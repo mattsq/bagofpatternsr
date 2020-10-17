@@ -10,11 +10,11 @@
 #' @param model a fitted model returned by `bagofpatterns_knn`
 #' @param newdata optional new data frame - if not passed, will return training set predictions
 #'
-#' @importFrom class knn
+#' @importFrom FNN knn
 #' @export
 predict_bagofpatterns_knn <- function(model, newdata = NULL, verbose = TRUE) {
   if(is.null(newdata)) {
-    preds <- class::knn(model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
+    preds <- FNN::knn(model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
                         model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
                         cl = unlist(model$converted_training_data[model$target]),
                         k = model$k)

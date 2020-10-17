@@ -3,7 +3,7 @@
 export("%>%")
 export(bagofpatterns_knn)
 export(predict_bagofpatterns_knn)
-importFrom(class,knn)
+importFrom(FNN,knn)
 importFrom(dplyr,bind_rows)
 importFrom(dplyr,group_by)
 importFrom(dplyr,select)
