@@ -9,6 +9,7 @@
 #' training data.
 #' @param data a data frame where each row is a time series, along with a column for class
 #' @param target the name of the column where the class of each row is stored
+#' @param k number of neighbours to base the predicted class on
 #' @param window_size The size of the sliding windows as applied to the time series
 #' @param alphabet_size the number of distinct letters to use in the compressed SAX representation
 #' @param PAA_number the size of the 'words' generated out of the alphabet by SAX
@@ -17,13 +18,15 @@
 #' @examples
 #'
 #' @export
-bagofpatterns_knn <- function(data, target = "target",
-                          k = 1,
-                          window_size = 200,
-                          alphabet_size = 4,
-                          PAA_number = 8,
-                          breakpoints = "quantiles",
-                          verbose = TRUE) {
+bagofpatterns_knn <- function(data,
+                              target = "target",
+                              k = 1,
+                              window_size = 200,
+                              sparse_windows = FALSE,
+                              alphabet_size = 4,
+                              PAA_number = 8,
+                              breakpoints = "quantiles",
+                              verbose = TRUE) {
   model_data <- list(
     training_data = data,
     converted_training_data = NA,
@@ -31,6 +34,7 @@ bagofpatterns_knn <- function(data, target = "target",
     k = k,
     SAX_args = list(
       window_size = window_size,
+      sparse_windows_val = ifelse(sparse_windows, floor(sqrt(ncol(FaceAll_TRAIN))), NA_real_),
       alphabet_size = alphabet_size,
       PAA_number = PAA_number,
       breakpoints = breakpoints
@@ -40,6 +44,7 @@ bagofpatterns_knn <- function(data, target = "target",
 
   converted_training_data = convert_df_to_bag_of_words(X_df,
                                                        window_size = model_data$SAX_args$window_size,
+                                                       sparse_windows_val = model_data$SAX_args$sparse_windows_val,
                                                        alphabet_size = model_data$SAX_args$alphabet_size,
                                                        PAA_number = model_data$SAX_args$PAA_number,
                                                        breakpoints = model_data$SAX_args$breakpoints,
