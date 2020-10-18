@@ -41,9 +41,11 @@ convert_vector_to_word_hist <- function(vec, window_size, sparse_windows_val, al
 
 #' @importFrom purrr map
 #' @importFrom dplyr bind_rows group_by summarise select
+#' @importFrom tibble as_tibble
+#' @importFrom data.table rbindlist dcast
 #' @importFrom tidyr pivot_wider
 convert_df_to_bag_of_words <- function(data, window_size, sparse_windows_val, alphabet_size, PAA_number, breakpoints, verbose) {
-  bow <- purrr::map_dfr(1:nrow(data), ~ {
+  bow <- purrr::map(1:nrow(data), ~ {
     if (verbose) print(.x)
     convert_vector_to_word_hist(unlist(data[.x,]),
                                 window_size = window_size,
@@ -52,12 +54,16 @@ convert_df_to_bag_of_words <- function(data, window_size, sparse_windows_val, al
                                 PAA_number = PAA_number,
                                 breakpoints = breakpoints)
   }, .id = "idx"
-  )
-  bow <- bow %>%
-    dplyr::group_by(words, idx) %>%
-    dplyr::summarise(Freq = sum(Freq)) %>%
-    tidyr::pivot_wider(id_cols = idx, names_from = words, values_from = Freq, values_fill = 0) %>%
-    dplyr::select(-idx)
+  ) %>% data.table::rbindlist(idcol = TRUE)
 
+  bow <- bow[, list(Freq = sum(Freq)), keyby = list(.id,words)]
+  bow <-   data.table::dcast(bow,
+                             .id ~ words,
+                             fun.aggregate = sum,
+                             fill = 0,
+                             value.var = "Freq")
+
+  bow <- bow[,!c(".id")]
+  bow <- tibble::as_tibble(bow)
     return(bow)
 }

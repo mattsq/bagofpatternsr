@@ -20,6 +20,8 @@ knitr::opts_chunk$set(
 
 The goal of bagofpatternsr is to provide a simple implementation of the 'Bag of Patterns' time series classification algorithm as described by Lin et al (2012). It's based on the description at timeseriesclassification.com - there are other implementations of it in R, but some are built in Java which can be tricky to run.
 
+It uses the `seewave::` implementation of Symbolic Aggregate eXPressions (SAX) for the patterns, `data.table::` for data munging and `FNN::` for fast K-Nearest Neighbours matching.
+
 ## Installation
 
 You can install the development version from [GitHub](https://github.com/) with:
