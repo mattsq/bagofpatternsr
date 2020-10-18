@@ -1,17 +1,13 @@
 
 #' @importFrom seewave SAX
 #' @importFrom dplyr slice_sample
-convert_vector_to_word_hist <- function(vec, window_size, sparse_windows_val, alphabet_size, PAA_number, breakpoints) {
-  vec_length <- length(vec)
-
-  windows <- data.frame(
-    window_starts = 1:(vec_length - window_size + 1),
-    window_ends = window_size:vec_length
-  )
-
-  if(!is.na(sparse_windows_val)) {
-    windows <- dplyr::slice_sample(windows, n = sparse_windows_val)
-  }
+convert_vector_to_word_hist <- function(vec,
+                                        window_size,
+                                        sparse_windows_val,
+                                        alphabet_size,
+                                        PAA_number,
+                                        breakpoints,
+                                        windows) {
 
   words <- character(nrow(windows))
   idx <- 1
@@ -44,7 +40,15 @@ convert_vector_to_word_hist <- function(vec, window_size, sparse_windows_val, al
 #' @importFrom tibble as_tibble
 #' @importFrom data.table rbindlist dcast
 #' @importFrom tidyr pivot_wider
-convert_df_to_bag_of_words <- function(data, window_size, sparse_windows_val, alphabet_size, PAA_number, breakpoints, verbose) {
+convert_df_to_bag_of_words <- function(data,
+                                       window_size,
+                                       sparse_windows_val,
+                                       alphabet_size,
+                                       PAA_number,
+                                       breakpoints,
+                                       verbose,
+                                       windows) {
+
   bow <- purrr::map(1:nrow(data), ~ {
     if (verbose) print(.x)
     convert_vector_to_word_hist(unlist(data[.x,]),
@@ -52,7 +56,8 @@ convert_df_to_bag_of_words <- function(data, window_size, sparse_windows_val, al
                                 sparse_windows_val = sparse_windows_val,
                                 alphabet_size = alphabet_size,
                                 PAA_number = PAA_number,
-                                breakpoints = breakpoints)
+                                breakpoints = breakpoints,
+                                windows = windows)
   }, .id = "idx"
   ) %>% data.table::rbindlist(idcol = TRUE)
 
