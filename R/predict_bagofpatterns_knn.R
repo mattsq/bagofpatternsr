@@ -26,7 +26,8 @@ predict_bagofpatterns_knn <- function(model, newdata = NULL, verbose = TRUE) {
                                                       alphabet_size = model$SAX_args$alphabet_size,
                                                       PAA_number = model$SAX_args$PAA_number,
                                                       breakpoints = model$SAX_args$breakpoints,
-                                                      verbose = verbose)
+                                                      verbose = verbose,
+                                                      windows = model$SAX_args$windows)
 
     converted_test_data_training_only <- converted_test_data[,which(colnames(converted_test_data) %in% colnames(model$converted_training_data))]
 

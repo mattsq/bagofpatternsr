@@ -37,10 +37,23 @@ bagofpatterns_knn <- function(data,
       sparse_windows_val = ifelse(sparse_windows, floor(sqrt(ncol(FaceAll_TRAIN))), NA_real_),
       alphabet_size = alphabet_size,
       PAA_number = PAA_number,
-      breakpoints = breakpoints
+      breakpoints = breakpoints,
+      windows = NA
     )
   )
   X_df <- data[,!colnames(data) == target]
+
+  vec_length <- ncol(X_df)
+    windows <- data.frame(
+      window_starts = 1:(vec_length - window_size + 1),
+      window_ends = window_size:vec_length
+    )
+
+  if(sparse_windows) {
+    windows <- dplyr::slice_sample(windows, n = model_data$SAX_args$sparse_windows_val)
+  }
+
+  model_data$SAX_args$windows <- windows
 
   converted_training_data = convert_df_to_bag_of_words(X_df,
                                                        window_size = model_data$SAX_args$window_size,
@@ -48,7 +61,8 @@ bagofpatterns_knn <- function(data,
                                                        alphabet_size = model_data$SAX_args$alphabet_size,
                                                        PAA_number = model_data$SAX_args$PAA_number,
                                                        breakpoints = model_data$SAX_args$breakpoints,
-                                                       verbose = verbose)
+                                                       verbose = verbose,
+                                                       windows = model_data$SAX_args$windows)
   converted_training_data[target] <- data[target]
   model_data$converted_training_data <- converted_training_data
 
