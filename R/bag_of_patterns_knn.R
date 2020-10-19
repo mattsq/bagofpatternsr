@@ -11,6 +11,8 @@
 #' @param target the name of the column where the class of each row is stored
 #' @param k number of neighbours to base the predicted class on
 #' @param window_size The size of the sliding windows as applied to the time series
+#' @param sparse_windows a logical, indicating whether `sqrt(m)` random windows should be taken instead of all
+#' @param normalize a logical, indicating whether each window should be z-normalized (`(x - mean(x)/sd(x)`)
 #' @param alphabet_size the number of distinct letters to use in the compressed SAX representation
 #' @param PAA_number the size of the 'words' generated out of the alphabet by SAX
 #' @param breakpoints the method used to assign letters (see `seewave::SAX`)
@@ -23,6 +25,7 @@ bagofpatterns_knn <- function(data,
                               k = 1,
                               window_size = 200,
                               sparse_windows = FALSE,
+                              normalize = TRUE,
                               alphabet_size = 4,
                               PAA_number = 8,
                               breakpoints = "quantiles",
@@ -36,6 +39,7 @@ bagofpatterns_knn <- function(data,
     SAX_args = list(
       window_size = window_size,
       sparse_windows_val = ifelse(sparse_windows, floor(sqrt(ncol(FaceAll_TRAIN))), NA_real_),
+      normalize = normalize,
       alphabet_size = alphabet_size,
       PAA_number = PAA_number,
       breakpoints = breakpoints,
@@ -60,6 +64,7 @@ bagofpatterns_knn <- function(data,
   converted_training_data = convert_df_to_bag_of_words(X_df,
                                                        window_size = model_data$SAX_args$window_size,
                                                        sparse_windows_val = model_data$SAX_args$sparse_windows_val,
+                                                       normalize = model_data$SAX_args$normalize,
                                                        alphabet_size = model_data$SAX_args$alphabet_size,
                                                        PAA_number = model_data$SAX_args$PAA_number,
                                                        breakpoints = model_data$SAX_args$breakpoints,

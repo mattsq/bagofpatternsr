@@ -10,6 +10,7 @@ bagofpatterns_knn(
   k = 1,
   window_size = 200,
   sparse_windows = FALSE,
+  normalize = TRUE,
   alphabet_size = 4,
   PAA_number = 8,
   breakpoints = "quantiles",
