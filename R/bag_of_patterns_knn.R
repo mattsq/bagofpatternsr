@@ -27,7 +27,8 @@ bagofpatterns_knn <- function(data,
                               PAA_number = 8,
                               breakpoints = "quantiles",
                               verbose = TRUE) {
-  model_data <- list(
+  model_data <- structure(
+      list(
     training_data = data,
     converted_training_data = NA,
     target = target,
@@ -39,8 +40,9 @@ bagofpatterns_knn <- function(data,
       PAA_number = PAA_number,
       breakpoints = breakpoints,
       windows = NA
-    )
-  )
+      )
+    ),
+    class = "bagofpatterns")
   X_df <- data[,!colnames(data) == target]
 
   vec_length <- ncol(X_df)

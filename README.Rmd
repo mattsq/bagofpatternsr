@@ -34,7 +34,7 @@ devtools::install_github("mattsq/bagofpatternsr")
 
 Using it is easy! Models are fit like so:
 
-```{r example}
+```{r train_1}
 library(bagofpatternsr)
 data("FaceAll_TRAIN")
 data("FaceAll_TEST")
@@ -48,17 +48,18 @@ model <- bagofpatternsr::bagofpatterns_knn(FaceAll_TRAIN,
 
 Predictions on new datasets can be retrieved like so:
 
-```{r cars}
-new_preds  <- bagofpatternsr::predict_bagofpatterns_knn(model, 
-                                                        newdata = FaceAll_TEST,
-                                                        verbose = FALSE)
+```{r predict_1}
+new_preds  <- predict(model, 
+                newdata = FaceAll_TEST,
+                verbose = FALSE)
 table(new_preds, FaceAll_TEST$target)
+mean(new_preds == FaceAll_TEST$target)
 
 ```
 
 There's support for the entirely atheoretical idea of 'sparse windows' - essentially, rather than generating a dictionary out of every single window, we take inspiration from Time Series Forest by taking `sqrt(m)` random windows from each vector. It speed up training dramatically, and seems to improve generalization - compare:
 
-```{r}
+```{r train_2_nosparse}
 library(tsforest)
 data("FreezerRegularTrain_TRAIN")
 
@@ -70,7 +71,7 @@ model <- bagofpatterns_knn(FreezerRegularTrain_TRAIN,
                            alphabet_size = 2,
                            PAA_number = 3)
 
-preds <- predict_bagofpatterns_knn(model, FreezerRegularTrain_TEST, verbose = FALSE)
+preds <- predict(model, FreezerRegularTrain_TEST, verbose = FALSE)
 
 table(preds, FreezerRegularTrain_TEST$target)
 mean(preds == FreezerRegularTrain_TEST$target)
@@ -78,7 +79,7 @@ mean(preds == FreezerRegularTrain_TEST$target)
 
 With:
 
-```{r}
+```{r train_2_sparse}
 data("FreezerRegularTrain_TRAIN")
 
 model <- bagofpatterns_knn(FreezerRegularTrain_TRAIN, 
@@ -88,7 +89,7 @@ model <- bagofpatterns_knn(FreezerRegularTrain_TRAIN,
                            alphabet_size = 2,
                            PAA_number = 3)
 
-preds <- predict_bagofpatterns_knn(model, FreezerRegularTrain_TEST, verbose = FALSE)
+preds <- predict(model, FreezerRegularTrain_TEST, verbose = FALSE)
 
 table(preds, FreezerRegularTrain_TEST$target)
 mean(preds == FreezerRegularTrain_TEST$target)
