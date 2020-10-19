@@ -4,6 +4,7 @@
 convert_vector_to_word_hist <- function(vec,
                                         window_size,
                                         sparse_windows_val,
+                                        normalize,
                                         alphabet_size,
                                         PAA_number,
                                         breakpoints,
@@ -11,6 +12,9 @@ convert_vector_to_word_hist <- function(vec,
 
   words <- character(nrow(windows))
   idx <- 1
+  if (normalize) {
+    vec <- (vec - mean(vec))/sd(vec)
+  }
 
   for (k2 in 1:nrow(windows)) {
     start <- (windows$window_starts[k2])
@@ -43,6 +47,7 @@ convert_vector_to_word_hist <- function(vec,
 convert_df_to_bag_of_words <- function(data,
                                        window_size,
                                        sparse_windows_val,
+                                       normalize,
                                        alphabet_size,
                                        PAA_number,
                                        breakpoints,
@@ -54,6 +59,7 @@ convert_df_to_bag_of_words <- function(data,
     convert_vector_to_word_hist(unlist(data[.x,]),
                                 window_size = window_size,
                                 sparse_windows_val = sparse_windows_val,
+                                normalize = normalize,
                                 alphabet_size = alphabet_size,
                                 PAA_number = PAA_number,
                                 breakpoints = breakpoints,

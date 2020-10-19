@@ -15,6 +15,7 @@ print.bagofpatterns <- function(x) {
   cat("  Word Size:", x$SAX_args$PAA_number, "\n")
   cat("  SAX breakpoint method:", x$SAX_args$breakpoints, "\n")
   cat("  Trained with sparse windows:", sparse_windows, "\n")
+  cat("  Windows Z-normalized before creating words:", x$SAX_args$normalize, "\n")
   cat("\n")
   cat("Examples of words in dictionary include:", paste(first_x_words, collapse = ", "))
 

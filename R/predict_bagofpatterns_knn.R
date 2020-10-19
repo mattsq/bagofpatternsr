@@ -23,6 +23,7 @@ predict.bagofpatterns <- function(model, newdata = NULL, verbose = TRUE) {
     converted_test_data <- convert_df_to_bag_of_words(X_test_df,
                                                       window_size = model$SAX_args$window_size,
                                                       sparse_windows_val = model$SAX_args$sparse_windows_val,
+                                                      normalize = model$SAX_args$normalize,
                                                       alphabet_size = model$SAX_args$alphabet_size,
                                                       PAA_number = model$SAX_args$PAA_number,
                                                       breakpoints = model$SAX_args$breakpoints,
