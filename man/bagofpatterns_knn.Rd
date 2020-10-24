@@ -26,6 +26,10 @@ bagofpatterns_knn(
 
 \item{window_size}{The size of the sliding windows as applied to the time series}
 
+\item{sparse_windows}{a logical, indicating whether \code{sqrt(m)} random windows should be taken instead of all}
+
+\item{normalize}{a logical, indicating whether each window should be z-normalized (\verb{(x - mean(x)/sd(x)})}
+
 \item{alphabet_size}{the number of distinct letters to use in the compressed SAX representation}
 
 \item{PAA_number}{the size of the 'words' generated out of the alphabet by SAX}

@@ -20,6 +20,10 @@ Imports:
     purrr,
     class,
     FNN,
-    data.table
+    data.table,
+    tibble
 Depends: 
     R (>= 2.10)
+Suggests: 
+    testthat,
+    Matrix
