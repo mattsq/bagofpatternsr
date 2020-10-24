@@ -1,7 +1,7 @@
 
 #' @export
 
-print.bagofpatterns <- function(x) {
+print.bagofpatterns <- function(x, ...) {
   training_data_col <- ncol(x$training_data) - 1
   converted_data_col <- ncol(x$converted_training_data)
   sparse_windows <- !is.na(x$SAX_args$sparse_windows_val)

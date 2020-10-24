@@ -12,7 +12,7 @@
 #'
 #' @importFrom FNN knn
 #' @export
-predict.bagofpatterns <- function(model, newdata = NULL, verbose = TRUE) {
+predict.bagofpatterns <- function(model, newdata = NULL, verbose = TRUE, ...) {
   if(is.null(newdata)) {
     preds <- FNN::knn(model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
                         model$converted_training_data[,!colnames(model$converted_training_data) == model$target],

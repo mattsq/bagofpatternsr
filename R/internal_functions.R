@@ -1,6 +1,7 @@
 
 #' @importFrom seewave SAX
 #' @importFrom dplyr slice_sample
+#' @importFrom stats sd
 convert_vector_to_word_hist <- function(vec,
                                         window_size,
                                         sparse_windows_val,
@@ -13,7 +14,7 @@ convert_vector_to_word_hist <- function(vec,
   words <- character(nrow(windows))
   idx <- 1
   if (normalize) {
-    vec <- (vec - mean(vec))/sd(vec)
+    vec <- (vec - mean(vec))/stats::sd(vec)
   }
 
   for (k2 in 1:nrow(windows)) {
