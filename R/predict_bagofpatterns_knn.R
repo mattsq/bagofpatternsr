@@ -9,10 +9,16 @@
 #'
 #' @param model a fitted model returned by `bagofpatterns_knn`
 #' @param newdata optional new data frame - if not passed, will return training set predictions
-#'
+#' @param verbose whether to print the fitting steps when creating the BoP representation
+#' @param ... Not used, left for generics consistency.
+#' @examples
+#' data("FaceAll_TRAIN")
+#' data("FaceAll_TEST")
+#' model <- bagofpatterns_knn(FaceAll_TRAIN, window_size = 10, verbose = FALSE)
+#' new_preds  <- predict(model, newdata = FaceAll_TEST, verbose = FALSE)
 #' @importFrom FNN knn
 #' @export
-predict.bagofpatterns <- function(model, newdata = NULL, verbose = TRUE) {
+predict.bagofpatterns <- function(model, newdata = NULL, verbose = TRUE, ...) {
   if(is.null(newdata)) {
     preds <- FNN::knn(model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
                         model$converted_training_data[,!colnames(model$converted_training_data) == model$target],

@@ -1,12 +1,12 @@
 Package: bagofpatternsr
 Title: R Implementation Of Bag of Patterns (Lin et al, 2012)
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     person(given = "Matthew",
            family = "Simmons",
            role = c("aut", "cre"),
            email = "first.last@example.com")
-Description: R Implementation of Bag of Patterns (Lin et al, 2012)
+Description: R Implementation of Bag of Patterns (Lin et al, 2012).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -20,6 +20,10 @@ Imports:
     purrr,
     class,
     FNN,
-    data.table
+    data.table,
+    tibble
 Depends: 
     R (>= 2.10)
+Suggests: 
+    testthat,
+    Matrix

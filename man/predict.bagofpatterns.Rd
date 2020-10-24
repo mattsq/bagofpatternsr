@@ -4,12 +4,16 @@
 \alias{predict.bagofpatterns}
 \title{Predict using a Bag of Patterns KNN Model}
 \usage{
-\method{predict}{bagofpatterns}(model, newdata = NULL, verbose = TRUE)
+\method{predict}{bagofpatterns}(model, newdata = NULL, verbose = TRUE, ...)
 }
 \arguments{
 \item{model}{a fitted model returned by \code{bagofpatterns_knn}}
 
 \item{newdata}{optional new data frame - if not passed, will return training set predictions}
+
+\item{verbose}{whether to print the fitting steps when creating the BoP representation}
+
+\item{...}{Not used, left for generics consistency.}
 }
 \description{
 Classifies new time series according to a trained BoP model using KNN
@@ -19,4 +23,10 @@ This function uses a trained Bag of Patterns model and K-Nearest Neighbours
 to classify new time series as members of a class. It converts the new
 data using the same \code{SAX} parameters as the original model and then uses only
 the words present in the training data as the basis for neighbour matching.
+}
+\examples{
+data("FaceAll_TRAIN")
+data("FaceAll_TEST")
+model <- bagofpatterns_knn(FaceAll_TRAIN, window_size = 10, verbose = FALSE)
+new_preds  <- predict(model, newdata = FaceAll_TEST, verbose = FALSE)
 }
