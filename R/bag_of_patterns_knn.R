@@ -18,7 +18,8 @@
 #' @param breakpoints the method used to assign letters (see `seewave::SAX`)
 #' @param verbose whether to print the progress of model creation.
 #' @examples
-#'
+#' data("FaceAll_TRAIN")
+#' model <- bagofpatterns_knn(FaceAll_TRAIN, window_size = 10, verbose = FALSE)
 #' @export
 bagofpatterns_knn <- function(data,
                               target = "target",

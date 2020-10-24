@@ -49,5 +49,6 @@ New examples are then fit by finding nearest neighbor examples with the converte
 training data.
 }
 \examples{
-
+data("FaceAll_TRAIN")
+model <- bagofpatterns_knn(FaceAll_TRAIN, window_size = 10, verbose = FALSE)
 }
