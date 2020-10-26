@@ -47,7 +47,7 @@ fit_bagofpatterns <- function(data,
   )
 
   if(sparse_windows) {
-    windows <- dplyr::slice_sample(windows, n = bagofpatterns_obj$SAX_args$sparse_windows_val)
+    windows <- dplyr::slice_sample(windows, n = floor(sqrt(ncol(X_df))))
   }
 
   bagofpatterns_obj$SAX_args$windows <- windows
