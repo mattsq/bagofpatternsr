@@ -4,16 +4,16 @@
 \alias{predict.bagofpatterns}
 \title{Predict using a Bag of Patterns KNN Model}
 \usage{
-\method{predict}{bagofpatterns}(model, newdata = NULL, verbose = TRUE, ...)
+\method{predict}{bagofpatterns}(model, newdata = NULL, ...)
 }
 \arguments{
 \item{model}{a fitted model returned by \code{bagofpatterns_knn}}
 
 \item{newdata}{optional new data frame - if not passed, will return training set predictions}
 
-\item{verbose}{whether to print the fitting steps when creating the BoP representation}
-
 \item{...}{Not used, left for generics consistency.}
+
+\item{verbose}{whether to print the fitting steps when creating the BoP representation}
 }
 \description{
 Classifies new time series according to a trained BoP model using KNN

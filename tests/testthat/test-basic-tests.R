@@ -9,7 +9,8 @@ test_that("Basic model fit and predict works correctly", {
                                                verbose = FALSE,
                                                normalize = TRUE,
                                                alphabet_size = 2,
-                                               PAA_number = 3)
+                                               PAA_number = 3,
+                                               k = 1)
 
     new_preds  <- predict(model,
                           newdata = FaceAll_TEST,

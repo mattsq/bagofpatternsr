@@ -44,7 +44,8 @@ model <- bagofpatternsr::bagofpatterns_knn(FaceAll_TRAIN,
                                            verbose = FALSE,
                                            normalize = TRUE,
                                            alphabet_size = 2, 
-                                           PAA_number = 3)
+                                           word_size = 3,
+                                           k = 1)
 print(model)
 ```
 
@@ -69,10 +70,10 @@ model <- bagofpatterns_knn(FreezerRegularTrain_TRAIN,
                            window_size = 100, 
                            sparse_windows = FALSE,
                            normalize = TRUE,
-                           k = 1, 
                            verbose = FALSE, 
                            alphabet_size = 2,
-                           PAA_number = 3)
+                           word_size = 3,
+                           k = 1)
 
 preds <- predict(model, FreezerRegularTrain_TEST, verbose = FALSE)
 
@@ -87,13 +88,47 @@ data("FreezerRegularTrain_TRAIN")
 
 model <- bagofpatterns_knn(FreezerRegularTrain_TRAIN, 
                            window_size = 100, 
-                           sparse_windows = TRUE, k = 1, 
+                           sparse_windows = TRUE, 
                            verbose = FALSE, 
                            alphabet_size = 2,
-                           PAA_number = 3)
+                           word_size = 3,
+                           k = 1)
 
 preds <- predict(model, FreezerRegularTrain_TEST, verbose = FALSE)
 
 table(preds, FreezerRegularTrain_TEST$target)
 mean(preds == FreezerRegularTrain_TEST$target)
+```
+
+You can also use `fit_bagofpatterns` and `bake_bagofpatterns` to use the underlying Bag Of Patterns representation for other models. Here's a simple example using logistic regression instead of K-Nearest Neighbors:
+
+```{r}
+data("FreezerRegularTrain_TRAIN")
+data("FreezerRegularTrain_TEST")
+
+bop_obj <- fit_bagofpatterns(FreezerRegularTrain_TRAIN,
+                              window_size = 100, 
+                              sparse_windows = FALSE, 
+                              verbose = FALSE, 
+                              alphabet_size = 2,
+                              word_size = 3)
+
+FreezerRegularTrain_TRAIN_conv <- bake_bagofpatterns(bop_obj)
+
+glm_model <- glm(target ~ ., data = FreezerRegularTrain_TRAIN_conv, family = "binomial")
+summary(glm_model)
+```
+
+We can generate predictions by calling `bake_bagofpatterns` on a new dataset:
+
+```{r}
+FreezerRegularTrain_TEST_conv  <- bake_bagofpatterns(bop_obj, FreezerRegularTrain_TEST)
+
+preds <- predict(glm_model, FreezerRegularTrain_TEST_conv, type = "response")
+
+preds <- as.numeric(preds>=0.5) + 1
+
+table(preds, FreezerRegularTrain_TEST$target)
+
+
 ```

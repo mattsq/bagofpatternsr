@@ -18,33 +18,35 @@
 #' new_preds  <- predict(model, newdata = FaceAll_TEST, verbose = FALSE)
 #' @importFrom FNN knn
 #' @export
-predict.bagofpatterns <- function(model, newdata = NULL, verbose = TRUE, ...) {
-  if(is.null(newdata)) {
-    preds <- FNN::knn(model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
-                        model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
-                        cl = unlist(model$converted_training_data[model$target]),
-                        k = model$k)
-  } else {
-    X_test_df <- newdata[,!colnames(newdata) == model$target]
-    converted_test_data <- convert_df_to_bag_of_words(X_test_df,
-                                                      window_size = model$SAX_args$window_size,
-                                                      sparse_windows_val = model$SAX_args$sparse_windows_val,
-                                                      normalize = model$SAX_args$normalize,
-                                                      alphabet_size = model$SAX_args$alphabet_size,
-                                                      PAA_number = model$SAX_args$PAA_number,
-                                                      breakpoints = model$SAX_args$breakpoints,
-                                                      verbose = verbose,
-                                                      windows = model$SAX_args$windows)
-
-    converted_test_data_training_only <- converted_test_data[,which(colnames(converted_test_data) %in% colnames(model$converted_training_data))]
-
-    missing_colnames <- colnames(model$converted_training_data)[which(!colnames(model$converted_training_data) %in% colnames(converted_test_data_training_only))]
-    converted_test_data_training_only[missing_colnames] <- 0
-
-    preds <- class::knn(train = model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
-                        test = converted_test_data_training_only[,!colnames(converted_test_data_training_only) == model$target],
-                        cl = unlist(model$converted_training_data[model$target]),
-                        k = model$k)
+predict.bagofpatterns <- function(model, newdata = NULL, ...) {
+  if(is.na(model$model_args)) {
+    stop("Bag Of Patterns model not trained with any KNN arguments.\n    Use 'bagofpatterns_knn' not 'fit_bagofpatterns'.")
   }
+
+  if(is.null(newdata)) {
+
+    FNN_knn_args <- append(
+      list(
+        train = model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
+        test = model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
+        cl = unlist(model$converted_training_data[model$target])
+      ),
+      model$model_args
+    )
+
+  } else {
+    converted_test_data_training_only <- bake_bagofpatterns(model, newdata)
+    FNN_knn_args <- append(
+                        list(
+                            train = model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
+                            test = converted_test_data_training_only[,!colnames(converted_test_data_training_only) == model$target],
+                            cl = unlist(model$converted_training_data[model$target])
+                          ),
+                          model$model_args
+                        )
+  }
+
+  preds <- do.call(FNN::knn, FNN_knn_args)
+
   return(preds)
 }
