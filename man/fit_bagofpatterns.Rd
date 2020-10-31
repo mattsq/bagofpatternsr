@@ -13,6 +13,8 @@ fit_bagofpatterns(
   alphabet_size = 4,
   word_size = 8,
   breakpoints = "quantiles",
+  word_weighting = tm::weightTf,
+  maximum_sparsity = NA,
   verbose = TRUE
 )
 }
@@ -32,6 +34,10 @@ fit_bagofpatterns(
 \item{word_size}{the size of the 'words' generated out of the alphabet by SAX}
 
 \item{breakpoints}{the method used to assign letters (see \code{seewave::SAX})}
+
+\item{word_weighting}{The weighting function for the DTM/TDM (default is term-frequency, effectively unweighted)}
+
+\item{maximum_sparsity}{A optional numeric for the maximal allowed sparsity in the range from bigger zero to smaller one.}
 
 \item{verbose}{whether to print the progress of model creation.}
 }

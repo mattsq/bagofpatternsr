@@ -14,7 +14,7 @@
 #' @examples
 #' data("FaceAll_TRAIN")
 #' data("FaceAll_TEST")
-#' model <- bagofpatterns_knn(FaceAll_TRAIN, window_size = 10, verbose = FALSE)
+#' model <- bagofpatterns_knn(FaceAll_TRAIN, window_size = 10, verbose = FALSE, k = 1)
 #' new_preds  <- predict(model, newdata = FaceAll_TEST, verbose = FALSE)
 #' @importFrom FNN knn
 #' @export

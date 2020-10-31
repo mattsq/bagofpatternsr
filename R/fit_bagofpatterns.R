@@ -13,6 +13,8 @@
 #' @param alphabet_size the number of distinct letters to use in the compressed SAX representation
 #' @param word_size the size of the 'words' generated out of the alphabet by SAX
 #' @param breakpoints the method used to assign letters (see `seewave::SAX`)
+#' @param word_weighting The weighting function for the DTM/TDM (default is term-frequency, effectively unweighted)
+#' @param maximum_sparsity A optional numeric for the maximal allowed sparsity in the range from bigger zero to smaller one.
 #' @param verbose whether to print the progress of model creation.
 #' @importFrom dplyr slice_sample
 #' @export
@@ -25,6 +27,8 @@ fit_bagofpatterns <- function(data,
                               alphabet_size = 4,
                               word_size = 8,
                               breakpoints = "quantiles",
+                              word_weighting = tm::weightTf,
+                              maximum_sparsity = NA,
                               verbose = TRUE) {
 
   bagofpatterns_obj <- new_bagofpatterns(data = data,
@@ -35,6 +39,8 @@ fit_bagofpatterns <- function(data,
                                          alphabet_size = alphabet_size,
                                          PAA_number = word_size,
                                          breakpoints = breakpoints,
+                                         word_weighting = word_weighting,
+                                         maximum_sparsity = maximum_sparsity,
                                          verbose = verbose)
 
   X_df <- data[,!colnames(data) == target]
