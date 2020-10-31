@@ -45,6 +45,8 @@ convert_vector_to_word_hist <- function(vec,
 #' @importFrom tibble as_tibble
 #' @importFrom data.table rbindlist dcast
 #' @importFrom tidyr pivot_wider
+#' @importFrom tidytext cast_dtm
+#' @importFrom tm removeSparseTerms nTerms
 convert_df_to_bag_of_words <- function(data,
                                        window_size,
                                        sparse_windows_val,
@@ -52,6 +54,8 @@ convert_df_to_bag_of_words <- function(data,
                                        alphabet_size,
                                        PAA_number,
                                        breakpoints,
+                                       word_weighting,
+                                       maximum_sparsity,
                                        verbose,
                                        windows) {
 
@@ -69,13 +73,14 @@ convert_df_to_bag_of_words <- function(data,
   ) %>% data.table::rbindlist(idcol = TRUE)
 
   bow <- bow[, list(Freq = sum(Freq)), keyby = list(.id,words)]
-  bow <-   data.table::dcast(bow,
-                             .id ~ words,
-                             fun.aggregate = sum,
-                             fill = 0,
-                             value.var = "Freq")
 
-  bow <- bow[,!c(".id")]
+  bow_dtm <- tidytext::cast_dtm(bow, .id, words, Freq, weighting = word_weighting)
+  if (!is.na(maximum_sparsity)) {
+    bow_dtm_sparse <- tm::removeSparseTerms(bow_dtm, sparse = maximum_sparsity)
+    if (tm::nTerms(bow_dtm_sparse) < 2) stop("Sparsity constraint resulted in less than two words used. Try a value closer to 1.")
+    bow_dtm <- bow_dtm_sparse
+  }
+  bow <- as.matrix(bow_dtm)
   bow <- tibble::as_tibble(bow)
     return(bow)
 }
