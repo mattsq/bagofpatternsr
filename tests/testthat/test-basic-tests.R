@@ -5,11 +5,11 @@ test_that("Basic model fit and predict works correctly", {
     data("FaceAll_TEST")
     model <- bagofpatternsr::bagofpatterns_knn(FaceAll_TRAIN,
                                                target = "target",
-                                               window_size = floor(sqrt(ncol(FaceAll_TRAIN))),
+                                               window_size = .9,
                                                verbose = FALSE,
-                                               normalize = TRUE,
+                                               normalize = FALSE,
                                                alphabet_size = 2,
-                                               word_size = 3,
+                                               word_size = 2,
                                                k = 1)
 
     new_preds  <- predict(model,
