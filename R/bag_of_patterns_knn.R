@@ -9,7 +9,7 @@
 #' training data.
 #' @param data a data frame where each row is a time series, along with a column for class
 #' @param target the name of the column where the class of each row is stored
-#' @param window_size The size of the sliding windows as applied to the time series
+#' @param window_size The size of the sliding windows as applied to the time series, either as a fraction of the length or an integer of precise length.
 #' @param sparse_windows a logical, indicating whether `sqrt(m)` random windows should be taken instead of all
 #' @param normalize a logical, indicating whether each window should be z-normalized (`(x - mean(x)/sd(x)`)
 #' @param alphabet_size the number of distinct letters to use in the compressed SAX representation
@@ -21,13 +21,13 @@
 #' @param ... arguments to be passed to `FNN:knn`
 #' @examples
 #' data("FaceAll_TRAIN")
-#' model <- bagofpatterns_knn(FaceAll_TRAIN, window_size = 10, verbose = FALSE, k = 1)
+#' model <- bagofpatterns_knn(FaceAll_TRAIN, window_size = .9, alphabet_size = 2, word_size = 2)
 #' @export
 bagofpatterns_knn <- function(data,
                               target = "target",
-                              window_size = 200,
+                              window_size = .2,
                               sparse_windows = FALSE,
-                              normalize = TRUE,
+                              normalize = FALSE,
                               alphabet_size = 4,
                               word_size = 8,
                               breakpoints = "quantiles",

@@ -7,9 +7,9 @@
 fit_bagofpatterns(
   data,
   target = "target",
-  window_size = 200,
+  window_size = 0.2,
   sparse_windows = FALSE,
-  normalize = TRUE,
+  normalize = FALSE,
   alphabet_size = 4,
   word_size = 8,
   breakpoints = "quantiles",
@@ -23,7 +23,7 @@ fit_bagofpatterns(
 
 \item{target}{the name of the column where the class of each row is stored}
 
-\item{window_size}{The size of the sliding windows as applied to the time series}
+\item{window_size}{The size of the sliding windows as applied to the time series, either as a fraction of the length or an integer of precise length.}
 
 \item{sparse_windows}{a logical, indicating whether \code{sqrt(m)} random windows should be taken instead of all}
 
