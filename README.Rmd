@@ -40,11 +40,11 @@ data("FaceAll_TRAIN")
 data("FaceAll_TEST")
 model <- bagofpatternsr::bagofpatterns_knn(FaceAll_TRAIN, 
                                            target = "target",
-                                           window_size = floor(sqrt(ncol(FaceAll_TRAIN))),
+                                           window_size = 20,
                                            verbose = FALSE,
                                            normalize = TRUE,
                                            alphabet_size = 2, 
-                                           word_size = 3,
+                                           word_size = 4,
                                            k = 1)
 print(model)
 ```
@@ -67,12 +67,12 @@ library(tsforest)
 data("FreezerRegularTrain_TRAIN")
 
 model <- bagofpatterns_knn(FreezerRegularTrain_TRAIN, 
-                           window_size = 100, 
+                           window_size = 20, 
                            sparse_windows = FALSE,
                            normalize = TRUE,
                            verbose = FALSE, 
-                           alphabet_size = 2,
-                           word_size = 3,
+                           alphabet_size = 3,
+                           word_size = 8,
                            k = 1)
 
 preds <- predict(model, FreezerRegularTrain_TEST, verbose = FALSE)
@@ -87,11 +87,11 @@ With:
 data("FreezerRegularTrain_TRAIN")
 
 model <- bagofpatterns_knn(FreezerRegularTrain_TRAIN, 
-                           window_size = 100, 
+                           window_size = 20, 
                            sparse_windows = TRUE, 
                            verbose = FALSE, 
-                           alphabet_size = 2,
-                           word_size = 3,
+                           alphabet_size = 3,
+                           word_size = 8,
                            k = 1)
 
 preds <- predict(model, FreezerRegularTrain_TEST, verbose = FALSE)
@@ -107,11 +107,11 @@ data("FreezerRegularTrain_TRAIN")
 data("FreezerRegularTrain_TEST")
 
 bop_obj <- fit_bagofpatterns(FreezerRegularTrain_TRAIN,
-                              window_size = 100, 
+                              window_size = 20, 
                               sparse_windows = FALSE, 
                               verbose = FALSE, 
-                              alphabet_size = 2,
-                              word_size = 3)
+                              alphabet_size = 3,
+                              word_size = 8)
 
 FreezerRegularTrain_TRAIN_conv <- bake_bagofpatterns(bop_obj)
 
