@@ -73,14 +73,6 @@ convert_df_to_bag_of_words <- function(data,
   ) %>% data.table::rbindlist(idcol = TRUE)
 
   bow <- bow[, list(Freq = sum(Freq)), keyby = list(.id,words)]
-
   bow_dtm <- tidytext::cast_dtm(bow, .id, words, Freq, weighting = word_weighting)
-  if (!is.na(maximum_sparsity)) {
-    bow_dtm_sparse <- tm::removeSparseTerms(bow_dtm, sparse = maximum_sparsity)
-    if (tm::nTerms(bow_dtm_sparse) < 2) stop("Sparsity constraint resulted in less than two words used. Try a value closer to 1.")
-    bow_dtm <- bow_dtm_sparse
-  }
-  bow <- as.matrix(bow_dtm)
-  bow <- tibble::as_tibble(bow)
-    return(bow)
+  return(bow_dtm)
 }
