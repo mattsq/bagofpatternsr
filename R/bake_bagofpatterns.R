@@ -16,6 +16,11 @@ bake_bagofpatterns <- function(bagofpatterns_obj, newdata = NULL) {
     X_test_df <- newdata[,!colnames(newdata) == bagofpatterns_obj$target]
     convert_call_args <- append(list(data = X_test_df), bagofpatterns_obj$SAX_args)
     converted_test_data <- do.call(convert_df_to_bag_of_words, convert_call_args)
+
+    converted_test_data <- as.matrix(converted_test_data)
+    converted_test_data <- tibble::as_tibble(converted_test_data)
+    converted_test_data[bagofpatterns_obj$target] <- newdata[bagofpatterns_obj$target]
+
     converted_test_data_training_only <- converted_test_data[,which(colnames(converted_test_data) %in% colnames(bagofpatterns_obj$converted_training_data))]
     missing_colnames <- colnames(bagofpatterns_obj$converted_training_data)[which(!colnames(bagofpatterns_obj$converted_training_data) %in% colnames(converted_test_data_training_only))]
     converted_test_data_training_only[missing_colnames] <- 0
