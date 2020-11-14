@@ -110,8 +110,8 @@ bop_obj <- fit_bagofpatterns(FreezerRegularTrain_TRAIN,
                               window_size = 20, 
                               sparse_windows = FALSE, 
                               verbose = FALSE, 
-                              alphabet_size = 3,
-                              word_size = 8)
+                              alphabet_size = 2,
+                              word_size = 3)
 
 FreezerRegularTrain_TRAIN_conv <- bake_bagofpatterns(bop_obj)
 
