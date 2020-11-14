@@ -21,8 +21,17 @@ bake_bagofpatterns <- function(bagofpatterns_obj, newdata = NULL) {
     converted_test_data <- tibble::as_tibble(converted_test_data)
     converted_test_data[bagofpatterns_obj$target] <- newdata[bagofpatterns_obj$target]
 
-    converted_test_data_training_only <- converted_test_data[,which(colnames(converted_test_data) %in% colnames(bagofpatterns_obj$converted_training_data))]
-    missing_colnames <- colnames(bagofpatterns_obj$converted_training_data)[which(!colnames(bagofpatterns_obj$converted_training_data) %in% colnames(converted_test_data_training_only))]
+    test_cols_in_train_idx <- which(colnames(converted_test_data) %in% colnames(bagofpatterns_obj$converted_training_data))
+
+    converted_test_data_training_only <- converted_test_data[,test_cols_in_train_idx]
+
+    train_cols_not_in_test_idx <- which(!colnames(bagofpatterns_obj$converted_training_data) %in% colnames(converted_test_data_training_only))
+    if(length(test_cols_in_train_idx)/(length(test_cols_in_train_idx) + length(train_cols_not_in_test_idx)) < .8) {
+      warning("More than 20% of the detected words in the new data weren't present in the training data.
+              Consider making the word size or alphabet smaller, or lowering the sparsity.")
+    }
+
+    missing_colnames <- colnames(bagofpatterns_obj$converted_training_data)[train_cols_not_in_test_idx]
     converted_test_data_training_only[missing_colnames] <- 0
     return(converted_test_data_training_only)
   }
