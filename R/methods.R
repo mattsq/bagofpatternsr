@@ -11,10 +11,16 @@ print.bagofpatterns <- function(x, ...) {
   converted_data_col <- ncol(x$converted_training_data)
   sparse_windows <- !is.na(x$SAX_args$sparse_windows_val)
   first_x_words <- names(dict)[1:dict_len]
+  actual_window_length <- floor(training_data_col*x$SAX_args$window_size)
+
   cat("A trained Bag Of Patterns object with:\n")
   cat("A time series of length", training_data_col, "converted into a word histogram with", converted_data_col, "entries, predicting class:", x$target, "\n")
   cat("The object has the following hyperparameters:\n")
-  cat("  Window Size:", x$SAX_args$window_size, "\n")
+  if (x$SAX_args$window_size <= 1) {
+    cat("  Window Size:", x$SAX_args$window_size, "(consisting of", actual_window_length, "timepoints)", "\n")
+  } else {
+    cat("  Window Size:", x$SAX_args$window_size, "\n")
+  }
   cat("  Alphabet Size:", x$SAX_args$alphabet_size, "\n")
   cat("  Word Size:", x$SAX_args$PAA_number, "\n")
   cat("  SAX breakpoint method:", x$SAX_args$breakpoints, "\n")
