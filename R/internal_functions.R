@@ -56,30 +56,30 @@ if (!requireNamespace("future", quietly = TRUE) ||
 #' @importFrom purrr map
 #' @importFrom dplyr bind_rows group_by summarise select
 #' @importFrom tibble as_tibble
-#' @importFrom data.table rbindlist dcast as.data.table
+#' @importFrom data.table rbindlist dcast as.data.table setDT set dcast
 #' @importFrom tidyr pivot_wider
 #' @importFrom tidytext cast_dtm
-#' @importFrom tm removeSparseTerms nTerms
+#' @importFrom tm removeSparseTerms nTerms as.DocumentTermMatrix
 convert_df_to_bag_of_words <- function(data,
                                      window_size,
                                      sparse_windows_val,
                                      normalize,
                                      alphabet_size,
-                                     word_size, # Updated parameter name
+                                     word_size,
                                      breakpoints,
                                      word_weighting,
                                      maximum_sparsity,
                                      verbose,
                                      windows) {
   
-  # Convert input to data.table
-  dt <- data.table::as.data.table(data)
+  # Ensure data is a data.table
+  dt <- data.table::setDT(data.table::copy(data))
   
-  # More efficient processing with data.table
+  # Pre-allocate list with exact size
   bow_list <- vector("list", length = nrow(dt))
   
   for (i in 1:nrow(dt)) {
-    if (verbose) cat("Processing row", i, "of", nrow(dt), "\n")
+    if (verbose && i %% 10 == 0) cat("Processing row", i, "of", nrow(dt), "\n")
     
     vec <- unlist(dt[i])
     bow_list[[i]] <- convert_vector_to_word_hist(
@@ -94,15 +94,41 @@ convert_df_to_bag_of_words <- function(data,
     )
     
     # Add row identifier
-    bow_list[[i]][, .id := i]
+    data.table::set(bow_list[[i]], j = ".id", value = i)
   }
   
-  # Combine and summarize with data.table
-  bow <- data.table::rbindlist(bow_list)
+  # Combine all results efficiently
+  bow <- data.table::rbindlist(bow_list, use.names = TRUE)
+  
+  # Aggregate by document and term
   bow <- bow[, list(Freq = sum(Freq)), by = list(.id, words)]
   
-  # Convert to document-term matrix
-  bow_dtm <- tidytext::cast_dtm(bow, .id, words, Freq, weighting = word_weighting)
+  # Create document-term matrix directly with data.table
+  dtm <- data.table::dcast(bow, .id ~ words, value.var = "Freq", fill = 0)
   
-  return(bow_dtm)
+  # Apply term weighting if needed
+  if (!identical(word_weighting, tm::weightTf)) {
+    # Convert to matrix for weighting
+    mat <- as.matrix(dtm[, -1, with = FALSE])
+    rownames(mat) <- dtm[[".id"]]
+    
+    # Apply weighting function
+    weighted_mat <- word_weighting(mat)
+    
+    # Convert back to document-term matrix format
+    dtm_weighted <- tm::as.DocumentTermMatrix(
+      weighted_mat,
+      weighting = word_weighting
+    )
+    return(dtm_weighted)
+  } else {
+    # Convert to DocumentTermMatrix format for consistency
+    mat <- as.matrix(dtm[, -1, with = FALSE])
+    rownames(mat) <- dtm[[".id"]]
+    dtm_result <- tm::as.DocumentTermMatrix(
+      mat,
+      weighting = tm::weightTf
+    )
+    return(dtm_result)
+  }
 }
