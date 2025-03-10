@@ -83,7 +83,7 @@ table(new_preds, FaceAll_TEST$target)
 #>        7   4  3  1  4  5  6 15  1 18  7 20 50  5  8
 #>        8   0  8  0  6 10  2 12 10  9 17 14  5 36  1
 #>        9   3 11  1  1  8  0 10  0 17  3  8  6 13 36
-mean(new_preds == FaceAll_TEST$target)
+mean(as.character(new_preds) == as.character(FaceAll_TEST$target))
 #> [1] 0.2792899
 ```
 

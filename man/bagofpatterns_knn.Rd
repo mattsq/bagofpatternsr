@@ -16,7 +16,9 @@ bagofpatterns_knn(
   word_weighting = tm::weightTf,
   maximum_sparsity = NA,
   verbose = TRUE,
-  ...
+  k = 3,
+  algorithm = "kd_tree",
+  prob = FALSE
 )
 }
 \arguments{

@@ -23,22 +23,24 @@ predict.bagofpatterns <- function(model, newdata = NULL, ...) {
   if (!inherits(model, "bagofpatterns")) {
     stop("First argument must be a 'bagofpatterns' object", call. = FALSE)
   }
-  
+
   # Check if model has KNN parameters
-  if (is.null(model$model_args) || is.na(model$model_args) || !is.list(model$model_args)) {
-    stop("Model not trained with KNN arguments. Use 'bagofpatterns_knn' not 'fit_bagofpatterns'.", 
+  if (is.null(model$model_args) ||
+        any(is.na(model$model_args)) ||
+        !is.list(model$model_args)) {
+    stop("Model not trained with KNN arguments. Use 'bagofpatterns_knn' not 'fit_bagofpatterns'.",
          call. = FALSE)
   }
-  
+
   # Extract target column name
   target <- model$target
-  
-  # For training data predictions 
+
+  # For training data predictions
   if (is.null(newdata)) {
     # Extract training features
     train_features <- model$converted_training_data[, !colnames(model$converted_training_data) == target, drop = FALSE]
     train_labels <- unlist(model$converted_training_data[target])
-    
+
     # Prepare KNN arguments
     FNN_knn_args <- c(
       list(
@@ -53,15 +55,15 @@ predict.bagofpatterns <- function(model, newdata = NULL, ...) {
     if (!is.data.frame(newdata)) {
       stop("'newdata' must be a data frame", call. = FALSE)
     }
-    
+
     # Convert test data to bag of patterns format
     converted_test_data <- bake_bagofpatterns(model, newdata)
-    
+
     # Extract features
     train_features <- model$converted_training_data[, !colnames(model$converted_training_data) == target, drop = FALSE]
     train_labels <- unlist(model$converted_training_data[target])
     test_features <- converted_test_data[, !colnames(converted_test_data) == target, drop = FALSE]
-    
+
     # Prepare KNN arguments
     FNN_knn_args <- c(
       list(
@@ -72,7 +74,7 @@ predict.bagofpatterns <- function(model, newdata = NULL, ...) {
       model$model_args
     )
   }
-  
+
   # Run prediction
   preds <- do.call(FNN::knn, FNN_knn_args)
   return(preds)
