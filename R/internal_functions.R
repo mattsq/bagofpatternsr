@@ -2,12 +2,13 @@
 #' @importFrom seewave SAX
 #' @importFrom dplyr slice_sample
 #' @importFrom stats sd
+#' @importFrom data.table data.table
 convert_vector_to_word_hist <- function(vec,
                                       window_size,
                                       sparse_windows_val,
                                       normalize,
                                       alphabet_size,
-                                      word_size, # Now using consistent naming
+                                      word_size, 
                                       breakpoints,
                                       windows) {
 
@@ -29,12 +30,11 @@ convert_vector_to_word_hist <- function(vec,
                 collapse = "")
   })
   
-  # Convert to vector and remove duplicates in one step
-  words <- unique(unlist(words))
+  # Unlist words (keeping all occurrences for frequency counting)
+  words <- unlist(words)
   
-  # Create frequency table directly with data.table
-  word_counts <- data.table::as.data.table(table(words))
-  colnames(word_counts) <- c("words", "Freq")
+  # Create word frequency table more efficiently with data.table
+  word_counts <- data.table::data.table(words = words)[, .(Freq = .N), by = words]
   
   return(word_counts)
 }
