@@ -19,34 +19,63 @@
 #' @importFrom FNN knn
 #' @export
 predict.bagofpatterns <- function(model, newdata = NULL, ...) {
-  if(is.na(model$model_args)) {
-    stop("Bag Of Patterns model not trained with any KNN arguments.\n    Use 'bagofpatterns_knn' not 'fit_bagofpatterns'.")
+  # Validate model object
+  if (!inherits(model, "bagofpatterns")) {
+    stop("First argument must be a 'bagofpatterns' object", call. = FALSE)
   }
 
-  if(is.null(newdata)) {
+  # Check if model has KNN parameters
+  if (is.null(model$model_args) ||
+        any(is.na(model$model_args)) ||
+        !is.list(model$model_args)) {
+    stop("Model not trained with KNN arguments. Use 'bagofpatterns_knn' not 'fit_bagofpatterns'.",
+         call. = FALSE)
+  }
 
-    FNN_knn_args <- append(
+  # Extract target column name
+  target <- model$target
+
+  # For training data predictions
+  if (is.null(newdata)) {
+    # Extract training features
+    train_features <- model$converted_training_data[, !colnames(model$converted_training_data) == target, drop = FALSE]
+    train_labels <- unlist(model$converted_training_data[target])
+
+    # Prepare KNN arguments
+    FNN_knn_args <- c(
       list(
-        train = model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
-        test = model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
-        cl = unlist(model$converted_training_data[model$target])
+        train = train_features,
+        test = train_features,
+        cl = train_labels
       ),
       model$model_args
     )
-
   } else {
-    converted_test_data_training_only <- bake_bagofpatterns(model, newdata)
-    FNN_knn_args <- append(
-                        list(
-                            train = model$converted_training_data[,!colnames(model$converted_training_data) == model$target],
-                            test = converted_test_data_training_only[,!colnames(converted_test_data_training_only) == model$target],
-                            cl = unlist(model$converted_training_data[model$target])
-                          ),
-                          model$model_args
-                        )
+    # Validate new data
+    if (!is.data.frame(newdata)) {
+      stop("'newdata' must be a data frame", call. = FALSE)
+    }
+
+    # Convert test data to bag of patterns format
+    converted_test_data <- bake_bagofpatterns(model, newdata)
+
+    # Extract features
+    train_features <- model$converted_training_data[, !colnames(model$converted_training_data) == target, drop = FALSE]
+    train_labels <- unlist(model$converted_training_data[target])
+    test_features <- converted_test_data[, !colnames(converted_test_data) == target, drop = FALSE]
+
+    # Prepare KNN arguments
+    FNN_knn_args <- c(
+      list(
+        train = train_features,
+        test = test_features,
+        cl = train_labels
+      ),
+      model$model_args
+    )
   }
 
+  # Run prediction
   preds <- do.call(FNN::knn, FNN_knn_args)
-
   return(preds)
 }

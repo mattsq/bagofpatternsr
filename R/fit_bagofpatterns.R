@@ -31,13 +31,39 @@ fit_bagofpatterns <- function(data,
                               maximum_sparsity = NA,
                               verbose = TRUE) {
 
+  # Add input validation
+  if (!is.data.frame(data)) {
+    stop("'data' must be a data frame", call. = FALSE)
+  }
+  
+  if (!(target %in% colnames(data))) {
+    stop("Target column '", target, "' not found in data", call. = FALSE)
+  }
+  
+  if (!is.numeric(alphabet_size) || alphabet_size < 2 || alphabet_size != round(alphabet_size)) {
+    stop("'alphabet_size' must be an integer >= 2", call. = FALSE)
+  }
+  
+  if (!is.numeric(word_size) || word_size < 1 || word_size != round(word_size)) {
+    stop("'word_size' must be a positive integer", call. = FALSE)
+  }
+  
+  valid_breakpoints <- c("quantiles", "uniform", "gaussian", "kmeans")
+  if (!(breakpoints %in% valid_breakpoints)) {
+    stop("'breakpoints' must be one of: ", paste(valid_breakpoints, collapse = ", "), call. = FALSE)
+  }
+  
+  if (!is.na(maximum_sparsity) && (!is.numeric(maximum_sparsity) || maximum_sparsity <= 0 || maximum_sparsity >= 1)) {
+    stop("'maximum_sparsity' must be between 0 and 1", call. = FALSE)
+  }                            
+
   bagofpatterns_obj <- new_bagofpatterns(data = data,
                                          target = target,
                                          window_size = window_size,
                                          sparse_windows = sparse_windows,
                                          normalize = normalize,
                                          alphabet_size = alphabet_size,
-                                         PAA_number = word_size,
+                                         word_size = word_size,
                                          breakpoints = breakpoints,
                                          word_weighting = word_weighting,
                                          maximum_sparsity = maximum_sparsity,

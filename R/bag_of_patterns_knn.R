@@ -34,21 +34,39 @@ bagofpatterns_knn <- function(data,
                               word_weighting = tm::weightTf,
                               maximum_sparsity = NA,
                               verbose = TRUE,
-                              ...) {
+                              k = 3,
+                              algorithm = "kd_tree",
+                              prob = FALSE) {
 
+  # Validate KNN parameters
+  if (!is.numeric(k) || k < 1 || k != round(k)) {
+    stop("'k' must be a positive integer", call. = FALSE)
+  }
+
+  valid_algorithms <- c("kd_tree", "cover_tree", "brute")
+  if (!(algorithm %in% valid_algorithms)) {
+    stop("'algorithm' must be one of: ", paste(valid_algorithms, collapse = ", "), call. = FALSE)
+  }
+
+  # Fit the bag of patterns model
   model_data <- fit_bagofpatterns(data = data,
-                                  target = target,
-                                  window_size = window_size,
-                                  sparse_windows = sparse_windows,
-                                  normalize = normalize,
-                                  alphabet_size = alphabet_size,
-                                  word_size = word_size,
-                                  breakpoints = breakpoints,
-                                  word_weighting = word_weighting,
-                                  maximum_sparsity = maximum_sparsity,
-                                  verbose = verbose)
+                                target = target,
+                                window_size = window_size,
+                                sparse_windows = sparse_windows,
+                                normalize = normalize,
+                                alphabet_size = alphabet_size,
+                                word_size = word_size,
+                                breakpoints = breakpoints,
+                                word_weighting = word_weighting,
+                                maximum_sparsity = maximum_sparsity,
+                                verbose = verbose)
 
-  model_data$model_args <- list(...)
+  # Store KNN parameters
+  model_data$model_args <- list(
+    k = k,
+    algorithm = algorithm,
+    prob = prob
+  )
 
   return(model_data)
 }
