@@ -3,6 +3,7 @@
 #' @importFrom dplyr slice_sample
 #' @importFrom stats sd
 #' @importFrom data.table data.table
+#' @importFrom future plan multiprocess future_apply
 convert_vector_to_word_hist <- function(vec,
                                       window_size,
                                       sparse_windows_val,
@@ -16,21 +17,11 @@ convert_vector_to_word_hist <- function(vec,
   if (normalize) {
     vec <- (vec - mean(vec))/stats::sd(vec)
   }
-  
-  # Extract all windows at once into a matrix
-  window_length <- windows$window_ends[1] - windows$window_starts[1] + 1
-  window_matrix <- matrix(0, nrow = window_length, ncol = nrow(windows))
 
-  for (i in 1:nrow(windows)) {
-    window_matrix[, i] <- vec[windows$window_starts[i]:windows$window_ends[i]]
-  }
-
-  # Apply normalization to entire matrix if needed
-  if (normalize) {
-    window_matrix <- apply(window_matrix, 2, function(x) (x - mean(x))/stats::sd(x))
-  }
-
-  # Process all windows with fewer function calls
+# Setup parallel processing if not already done
+if (!requireNamespace("future", quietly = TRUE) || 
+    !requireNamespace("future.apply", quietly = TRUE)) {
+  # Fall back to serial processing if packages not available
   words <- apply(window_matrix, 2, function(window) {
     seewave::SAX(window,
                 alphabet_size = alphabet_size,
@@ -38,6 +29,20 @@ convert_vector_to_word_hist <- function(vec,
                 breakpoints = breakpoints,
                 collapse = "")
   })
+} else {
+  # Use parallel processing
+  old_plan <- future::plan(future::multiprocess)
+  on.exit(future::plan(old_plan), add = TRUE)
+  
+  # Process windows in parallel 
+  words <- future.apply::future_apply(window_matrix, 2, function(window) {
+    seewave::SAX(window,
+                alphabet_size = alphabet_size,
+                PAA_number = word_size,
+                breakpoints = breakpoints,
+                collapse = "")
+  })
+}
   
   # Unlist words (keeping all occurrences for frequency counting)
   words <- unlist(words)
