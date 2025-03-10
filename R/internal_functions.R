@@ -38,13 +38,6 @@ convert_vector_to_word_hist <- function(vec,
                 breakpoints = breakpoints,
                 collapse = "")
   })
-    
-    seewave::SAX(vec_window,
-                alphabet_size = alphabet_size,
-                PAA_number = word_size,
-                breakpoints = breakpoints,
-                collapse = "")
-  })
   
   # Unlist words (keeping all occurrences for frequency counting)
   words <- unlist(words)
