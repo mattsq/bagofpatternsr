@@ -17,6 +17,9 @@
 #' @param maximum_sparsity A optional numeric for the maximal allowed sparsity in the range from bigger zero to smaller one.
 #' @param verbose whether to print the progress of model creation.
 #' @importFrom dplyr slice_sample
+#' @importFrom tm removeSparseTerms nTerms
+#' @importFrom Matrix sparseMatrix
+#' @importFrom tibble tibble
 #' @export
 
 fit_bagofpatterns <- function(data,
@@ -93,18 +96,39 @@ fit_bagofpatterns <- function(data,
   bagofpatterns_obj$SAX_args$windows <- windows
 
   convert_call_args <- append(list(data = X_df), bagofpatterns_obj$SAX_args)
-  # Get document-term matrix
-  dtm <- do.call(convert_df_to_bag_of_words, convert_call_args)
+# Get document-term matrix
+dtm <- do.call(convert_df_to_bag_of_words, convert_call_args)
 
-  # Apply sparsity constraint if needed
-  if (!is.na(maximum_sparsity)) {
-    dtm_sparse <- tm::removeSparseTerms(dtm, sparse = maximum_sparsity)
-    if (tm::nTerms(dtm_sparse) < 2) stop("Sparsity constraint resulted in less than two words used. Try a value closer to 1.")
-    dtm <- dtm_sparse
-  }
+# Apply sparsity constraint if needed
+if (!is.na(maximum_sparsity)) {
+  dtm_sparse <- tm::removeSparseTerms(dtm, sparse = maximum_sparsity)
+  if (tm::nTerms(dtm_sparse) < 2) stop("Sparsity constraint resulted in less than two words used. Try a value closer to 1.")
+  dtm <- dtm_sparse
+}
 
-  # Convert directly to tibble with only one conversion step
+# Store sparse structure in model for later use
+bagofpatterns_obj$sparse_dtm <- dtm
+
+# Convert to tibble efficiently - only materialize if needed
+if (inherits(dtm, "DocumentTermMatrix")) {
+  # Extract sparse components
+  dtm_summary <- Matrix::summary(dtm)
+  
+  # Create sparse matrix directly
+  sparse_matrix <- Matrix::sparseMatrix(
+    i = dtm_summary$i,
+    j = dtm_summary$j,
+    x = dtm_summary$v,
+    dims = dim(dtm),
+    dimnames = list(rownames(dtm), colnames(dtm))
+  )
+  
+  # Convert to regular matrix only for final step
+  converted_training_data <- tibble::as_tibble(as.matrix(sparse_matrix))
+} else {
+  # Fallback for non-DTM objects
   converted_training_data <- tibble::as_tibble(as.matrix(dtm))
+}
 
   # Add target column by reference
   converted_training_data[[target]] <- data[[target]]
