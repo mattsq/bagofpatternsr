@@ -17,11 +17,27 @@ convert_vector_to_word_hist <- function(vec,
     vec <- (vec - mean(vec))/stats::sd(vec)
   }
   
-  # Use lapply instead of for loop
-  words <- lapply(1:nrow(windows), function(k) {
-    start <- windows$window_starts[k]
-    end <- windows$window_ends[k]
-    vec_window <- vec[start:end]
+  # Extract all windows at once into a matrix
+  window_length <- windows$window_ends[1] - windows$window_starts[1] + 1
+  window_matrix <- matrix(0, nrow = window_length, ncol = nrow(windows))
+
+  for (i in 1:nrow(windows)) {
+    window_matrix[, i] <- vec[windows$window_starts[i]:windows$window_ends[i]]
+  }
+
+  # Apply normalization to entire matrix if needed
+  if (normalize) {
+    window_matrix <- apply(window_matrix, 2, function(x) (x - mean(x))/stats::sd(x))
+  }
+
+  # Process all windows with fewer function calls
+  words <- apply(window_matrix, 2, function(window) {
+    seewave::SAX(window,
+                alphabet_size = alphabet_size,
+                PAA_number = word_size,
+                breakpoints = breakpoints,
+                collapse = "")
+  })
     
     seewave::SAX(vec_window,
                 alphabet_size = alphabet_size,
