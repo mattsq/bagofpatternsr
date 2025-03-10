@@ -93,17 +93,21 @@ fit_bagofpatterns <- function(data,
   bagofpatterns_obj$SAX_args$windows <- windows
 
   convert_call_args <- append(list(data = X_df), bagofpatterns_obj$SAX_args)
-  converted_training_data <- do.call(convert_df_to_bag_of_words, convert_call_args)
+  # Get document-term matrix
+  dtm <- do.call(convert_df_to_bag_of_words, convert_call_args)
 
+  # Apply sparsity constraint if needed
   if (!is.na(maximum_sparsity)) {
-    converted_training_data_sparse <- tm::removeSparseTerms(converted_training_data, sparse = maximum_sparsity)
-    if (tm::nTerms(converted_training_data_sparse) < 2) stop("Sparsity constraint resulted in less than two words used. Try a value closer to 1.")
-    converted_training_data <- converted_training_data_sparse
+    dtm_sparse <- tm::removeSparseTerms(dtm, sparse = maximum_sparsity)
+    if (tm::nTerms(dtm_sparse) < 2) stop("Sparsity constraint resulted in less than two words used. Try a value closer to 1.")
+    dtm <- dtm_sparse
   }
-  converted_training_data <- as.matrix(converted_training_data)
-  converted_training_data <- tibble::as_tibble(converted_training_data)
 
-  converted_training_data[target] <- data[target]
+  # Convert directly to tibble with only one conversion step
+  converted_training_data <- tibble::as_tibble(as.matrix(dtm))
+
+  # Add target column by reference
+  converted_training_data[[target]] <- data[[target]]
   bagofpatterns_obj$converted_training_data <- converted_training_data
 
   return(bagofpatterns_obj)
