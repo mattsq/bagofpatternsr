@@ -3,41 +3,40 @@
 #' @importFrom dplyr slice_sample
 #' @importFrom stats sd
 convert_vector_to_word_hist <- function(vec,
-                                        window_size,
-                                        sparse_windows_val,
-                                        normalize,
-                                        alphabet_size,
-                                        word_size,
-                                        breakpoints,
-                                        windows) {
+                                      window_size,
+                                      sparse_windows_val,
+                                      normalize,
+                                      alphabet_size,
+                                      word_size, # Now using consistent naming
+                                      breakpoints,
+                                      windows) {
 
-  words <- character(nrow(windows))
-  idx <- 1
+  # Normalize once if needed
   if (normalize) {
     vec <- (vec - mean(vec))/stats::sd(vec)
   }
-
-  for (k2 in 1:nrow(windows)) {
-    start <- (windows$window_starts[k2])
-    end <- (windows$window_ends[k2])
+  
+  # Use lapply instead of for loop
+  words <- lapply(1:nrow(windows), function(k) {
+    start <- windows$window_starts[k]
+    end <- windows$window_ends[k]
     vec_window <- vec[start:end]
-    word <- seewave::SAX(vec_window,
-                         alphabet_size = alphabet_size,
-                         PAA_number = word_size,
-                         breakpoints = breakpoints,
-                         collapse = "")
-    if (k2 > 1 & idx > 1) {
-      if (word == words[idx-1]) {
-        next
-      }
-    }
-    words[idx] <- word
-    idx <- idx + 1
-  }
-
-  words <- words[!words == ""]
-  words <- as.data.frame(table(words))
-  return(words)
+    
+    seewave::SAX(vec_window,
+                alphabet_size = alphabet_size,
+                PAA_number = word_size,
+                breakpoints = breakpoints,
+                collapse = "")
+  })
+  
+  # Convert to vector and remove duplicates in one step
+  words <- unique(unlist(words))
+  
+  # Create frequency table directly with data.table
+  word_counts <- data.table::as.data.table(table(words))
+  colnames(word_counts) <- c("words", "Freq")
+  
+  return(word_counts)
 }
 
 #' @importFrom purrr map
