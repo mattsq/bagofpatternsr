@@ -42,36 +42,53 @@ convert_vector_to_word_hist <- function(vec,
 #' @importFrom purrr map
 #' @importFrom dplyr bind_rows group_by summarise select
 #' @importFrom tibble as_tibble
-#' @importFrom data.table rbindlist dcast
+#' @importFrom data.table rbindlist dcast as.data.table
 #' @importFrom tidyr pivot_wider
 #' @importFrom tidytext cast_dtm
 #' @importFrom tm removeSparseTerms nTerms
 convert_df_to_bag_of_words <- function(data,
-                                       window_size,
-                                       sparse_windows_val,
-                                       normalize,
-                                       alphabet_size,
-                                       word_size,
-                                       breakpoints,
-                                       word_weighting,
-                                       maximum_sparsity,
-                                       verbose,
-                                       windows) {
-
-  bow <- purrr::map(1:nrow(data), ~ {
-    if (verbose) print(.x)
-    convert_vector_to_word_hist(unlist(data[.x,]),
-                                window_size = window_size,
-                                sparse_windows_val = sparse_windows_val,
-                                normalize = normalize,
-                                alphabet_size = alphabet_size,
-                                word_size = word_size,
-                                breakpoints = breakpoints,
-                                windows = windows)
-  }, .id = "idx"
-  ) %>% data.table::rbindlist(idcol = TRUE)
-
-  bow <- bow[, list(Freq = sum(Freq)), keyby = list(.id,words)]
+                                     window_size,
+                                     sparse_windows_val,
+                                     normalize,
+                                     alphabet_size,
+                                     word_size, # Updated parameter name
+                                     breakpoints,
+                                     word_weighting,
+                                     maximum_sparsity,
+                                     verbose,
+                                     windows) {
+  
+  # Convert input to data.table
+  dt <- data.table::as.data.table(data)
+  
+  # More efficient processing with data.table
+  bow_list <- vector("list", length = nrow(dt))
+  
+  for (i in 1:nrow(dt)) {
+    if (verbose) cat("Processing row", i, "of", nrow(dt), "\n")
+    
+    vec <- unlist(dt[i])
+    bow_list[[i]] <- convert_vector_to_word_hist(
+      vec = vec,
+      window_size = window_size,
+      sparse_windows_val = sparse_windows_val,
+      normalize = normalize,
+      alphabet_size = alphabet_size,
+      word_size = word_size,
+      breakpoints = breakpoints,
+      windows = windows
+    )
+    
+    # Add row identifier
+    bow_list[[i]][, .id := i]
+  }
+  
+  # Combine and summarize with data.table
+  bow <- data.table::rbindlist(bow_list)
+  bow <- bow[, list(Freq = sum(Freq)), by = list(.id, words)]
+  
+  # Convert to document-term matrix
   bow_dtm <- tidytext::cast_dtm(bow, .id, words, Freq, weighting = word_weighting)
+  
   return(bow_dtm)
 }
