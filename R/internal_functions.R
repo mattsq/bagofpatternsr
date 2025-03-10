@@ -7,7 +7,7 @@ convert_vector_to_word_hist <- function(vec,
                                         sparse_windows_val,
                                         normalize,
                                         alphabet_size,
-                                        PAA_number,
+                                        word_size,
                                         breakpoints,
                                         windows) {
 
@@ -23,7 +23,7 @@ convert_vector_to_word_hist <- function(vec,
     vec_window <- vec[start:end]
     word <- seewave::SAX(vec_window,
                          alphabet_size = alphabet_size,
-                         PAA_number = PAA_number,
+                         PAA_number = word_size,
                          breakpoints = breakpoints,
                          collapse = "")
     if (k2 > 1 & idx > 1) {
@@ -52,7 +52,7 @@ convert_df_to_bag_of_words <- function(data,
                                        sparse_windows_val,
                                        normalize,
                                        alphabet_size,
-                                       PAA_number,
+                                       word_size,
                                        breakpoints,
                                        word_weighting,
                                        maximum_sparsity,
@@ -66,7 +66,7 @@ convert_df_to_bag_of_words <- function(data,
                                 sparse_windows_val = sparse_windows_val,
                                 normalize = normalize,
                                 alphabet_size = alphabet_size,
-                                PAA_number = PAA_number,
+                                word_size = word_size,
                                 breakpoints = breakpoints,
                                 windows = windows)
   }, .id = "idx"
