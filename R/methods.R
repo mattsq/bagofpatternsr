@@ -69,7 +69,7 @@ print.bagofpatterns <- function(x, ...) {
 
     # Print remaining parameters safely
     cat("  Alphabet Size:", x$SAX_args$alphabet_size, "\n")
-    cat("  Word Size:", x$SAX_args$PAA_number, "\n")
+    cat("  Word Size:", x$SAX_args$word_size, "\n")
     cat("  SAX breakpoint method:", x$SAX_args$breakpoints, "\n")
 
     # Only show weighting method if available
