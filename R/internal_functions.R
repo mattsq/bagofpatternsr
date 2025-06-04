@@ -29,8 +29,13 @@ convert_vector_to_word_hist <- function(vec,
                 collapse = "")
   })
   
-  # Convert to vector and remove duplicates in one step
-  words <- unique(unlist(words))
+  # Convert list of words to vector
+  #
+  # Duplicates must be preserved so that the frequency table
+  # correctly reflects how often each word occurs in the sliding
+  # windows.  Using `unique()` here would discard repeated words and
+  # therefore return incorrect counts.
+  words <- unlist(words)
   
   # Create frequency table directly with data.table
   word_counts <- data.table::as.data.table(table(words))
