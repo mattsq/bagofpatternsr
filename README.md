@@ -90,7 +90,7 @@ mean(as.character(new_preds) == as.character(FaceAll_TEST$target))
 There’s support for the entirely atheoretical idea of ‘sparse windows’ -
 essentially, rather than generating a dictionary out of every single
 window, we take inspiration from Time Series Forest by taking `sqrt(m)`
-random windows from each vector. It speed up training dramatically, and
+random windows from each vector. It **speeds** up training dramatically, and
 seems to improve generalization - compare:
 
 ``` r
