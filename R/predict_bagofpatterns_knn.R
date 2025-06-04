@@ -9,7 +9,6 @@
 #'
 #' @param model a fitted model returned by `bagofpatterns_knn`
 #' @param newdata optional new data frame - if not passed, will return training set predictions
-#' @param verbose whether to print the fitting steps when creating the BoP representation
 #' @param ... Not used, left for generics consistency.
 #' @examples
 #' data("FaceAll_TRAIN")
