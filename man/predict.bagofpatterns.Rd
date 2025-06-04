@@ -13,8 +13,6 @@
 
 \item{...}{Not used, left for generics consistency.}
 
-\item{verbose}{whether to print the fitting steps when creating the BoP representation}
-}
 \description{
 Classifies new time series according to a trained BoP model using KNN
 }
@@ -27,6 +25,4 @@ the words present in the training data as the basis for neighbour matching.
 \examples{
 data("FaceAll_TRAIN")
 data("FaceAll_TEST")
-model <- bagofpatterns_knn(FaceAll_TRAIN, window_size = 10, verbose = FALSE, k = 1)
-new_preds  <- predict(model, newdata = FaceAll_TEST, verbose = FALSE)
 }
